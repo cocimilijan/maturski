@@ -1,0 +1,9 @@
+/* Skriva skrolbar, ali zadržava funkcionalnost skrolovanja */
+::-webkit-scrollbar { 
+    display: none; 
+}
+
+/* Glatko skrolovanje za celu aplikaciju */
+html { 
+    scroll-behavior: smooth; 
+}

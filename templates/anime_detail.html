@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if anime %}
+<div class="absolute inset-0 z-0 h-[60vh] overflow-hidden">
+    <img src="{{ anime.images.webp.large_image_url }}" class="w-full h-full object-cover opacity-20 blur-xl">
+    <div class="absolute inset-0 bg-gradient-to-t from-[#050505] to-transparent"></div>
+</div>
+
+<div class="relative z-10 pt-28 px-6 md:px-24 min-h-screen pb-20">
+    <div class="mb-8">
+        <button onclick="history.back()" class="flex items-center gap-2 text-gray-400 hover:text-white transition group w-fit">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+            <span class="text-sm font-bold uppercase tracking-widest">Nazad</span>
+        </button>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-12">
+        <div class="w-full md:w-1/4 shrink-0">
+            <img src="{{ anime.images.webp.large_image_url }}" alt="Poster" class="w-full rounded-2xl shadow-2xl border border-white/10">
+            <div class="mt-6 bg-gray-900/50 p-4 rounded-xl border border-white/5 text-sm text-gray-400 space-y-2">
+                <p><strong class="text-white">Status:</strong> {{ 'Emituje se' if anime.status == 'Currently Airing' else 'Završeno' }}</p>
+                <p><strong class="text-white">Epizode:</strong> {{ anime.episodes or 'Nepoznato' }}</p>
+                <p><strong class="text-white">Godina:</strong> {{ anime.year or 'Nepoznato' }}</p>
+                <p><strong class="text-white">Studio:</strong> {{ anime.studios[0].name if anime.studios else 'Nepoznato' }}</p>
+            </div>
+        </div>
+
+        <div class="w-full md:w-3/4">
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+                <span class="bg-indigo-600 text-white text-[10px] font-black px-2 py-1 rounded uppercase tracking-wider">{{ anime.type }}</span>
+                <span class="text-indigo-400 text-sm font-bold bg-indigo-900/30 px-3 py-1 rounded-full">★ Ocenjeno: {{ anime.score or 'N/A' }}</span>
+            </div>
+            
+            <h1 class="text-4xl md:text-6xl font-black mb-2 uppercase tracking-tighter">{{ anime.title_english or anime.title }}</h1>
+            <h2 class="text-xl text-gray-500 mb-6">{{ anime.title }}</h2>
+            
+            <div class="flex flex-wrap gap-2 mb-8">
+                {% for genre in anime.genres %}
+                    <span class="text-xs font-bold text-gray-300 border border-gray-700 px-3 py-1 rounded-full">{{ genre.name }}</span>
+                {% endfor %}
+            </div>
+
+            <p class="text-gray-300 mb-10 leading-relaxed text-justify">{{ anime.synopsis }}</p>
+
+            <div class="bg-gray-900 border border-white/10 p-8 rounded-2xl w-full max-w-xl shadow-xl">
+                <h3 class="text-xl font-bold mb-6 uppercase tracking-wider text-white border-b border-white/10 pb-4">Tvoja Privatna Lista</h3>
+                
+                {% if not session.get('user') %}
+                    <div class="bg-indigo-900/20 border border-indigo-500/30 p-4 rounded-lg text-center">
+                        <p class="text-sm text-indigo-200 mb-3">Morate biti prijavljeni da biste ocenili i sačuvali anime.</p>
+                        <a href="{{ url_for('login') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-8 rounded-full text-sm uppercase inline-block transition">Prijavite se</a>
+                    </div>
+                {% else %}
+                    <form action="{{ url_for('save_anime') }}" method="POST" class="flex flex-col gap-5">
+                        <input type="hidden" name="anime_id" value="{{ anime.mal_id }}">
+                        
+                        <div class="flex gap-4">
+                            <div class="flex-1">
+                                <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Status Gledanja</label>
+                                <select name="status" class="w-full bg-black border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-indigo-500 transition cursor-pointer">
+                                    <option value="Odustao" {% if review and review.status == 'Odustao' %}selected{% endif %}>Odustao</option>
+                                    <option value="Planiram" {% if review and review.status == 'Planiram' %}selected{% endif %}>Planiram da gledam</option>
+                                    <option value="Gledam" {% if review and review.status == 'Gledam' %}selected{% endif %}>Gledam</option>
+                                    <option value="Završeno" {% if review and review.status == 'Završeno' %}selected{% endif %}>Završeno</option>
+                                </select>
+                            </div>
+                            <div class="w-32">
+                                <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Ocena</label>
+                                <input type="number" name="ocena" min="1" max="10" placeholder="Bez" value="{{ review.ocena if review and review.ocena > 0 else '' }}" class="w-full bg-black border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-indigo-500 transition text-center placeholder-gray-600">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-white text-black hover:bg-indigo-500 hover:text-white font-black py-4 rounded-lg mt-2 transition transform hover:-translate-y-1 shadow-lg uppercase tracking-widest text-sm">
+                            {% if review %} Ažuriraj Podatke {% else %} Sačuvaj u Listu {% endif %}
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="min-h-screen flex items-center justify-center pt-16">
+    <h1 class="text-3xl font-bold text-red-500 uppercase tracking-widest">Greška: Anime nije pronađen u bazi.</h1>
+</div>
+{% endif %}
+{% endblock %}

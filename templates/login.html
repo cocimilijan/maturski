@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center pt-16 px-4">
+    <div class="bg-gray-900/50 backdrop-blur-md p-10 rounded-2xl shadow-xl w-full max-w-md border border-white/5">
+        <h2 class="text-3xl font-black mb-6 text-center tracking-tighter uppercase">Prijava na <span class="text-indigo-500">Sistem</span></h2>
+        
+        <form method="POST" action="{{ url_for('login') }}" class="flex flex-col gap-4">
+            <div>
+                <label class="block text-gray-400 text-xs font-bold mb-2 uppercase tracking-widest">Email adresa</label>
+                <input type="email" name="email" value="{{ unconfirmed_email if unconfirmed_email else '' }}" required class="w-full bg-black border border-gray-700 rounded p-3 text-white outline-none focus:border-indigo-500 transition">
+            </div>
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-gray-400 text-xs font-bold uppercase tracking-widest">Lozinka</label>
+                    <a href="{{ url_for('forgot_password') }}" class="text-[10px] text-indigo-400 hover:text-white transition uppercase font-bold tracking-wider">Zaboravljena lozinka?</a>
+                </div>
+                <input type="password" name="password" required class="w-full bg-black border border-gray-700 rounded p-3 text-white outline-none focus:border-indigo-500 transition">
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded mt-4 transition uppercase tracking-wider hover:shadow-lg hover:shadow-indigo-500/20">
+                Prijavi me
+            </button>
+        </form>
+
+        {% if unconfirmed_email %}
+        <form method="POST" action="{{ url_for('resend_confirmation') }}" class="mt-6 bg-red-900/20 border border-red-500/30 p-5 rounded-xl text-center">
+            <p class="text-sm text-red-200 mb-3 font-bold">Niste dobili email za potvrdu?</p>
+            <input type="hidden" name="email" value="{{ unconfirmed_email }}">
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs font-black py-3 px-6 rounded-full transition uppercase tracking-widest w-full">
+                Pošalji novi link
+            </button>
+        </form>
+        {% endif %}
+
+        <p class="text-center text-gray-500 text-sm mt-6">Nemate nalog? <a href="{{ url_for('register') }}" class="text-indigo-400 hover:text-white transition font-bold">Registrujte se</a></p>
+    </div>
+</div>
+{% endblock %}

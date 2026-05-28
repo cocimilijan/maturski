@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="relative min-h-screen w-full flex items-center overflow-hidden bg-[#050505]">
+    <div class="absolute inset-0 z-0">
+        <img id="hero-img" src="" alt="Cover" class="w-full h-full object-cover opacity-40 transition-opacity duration-1000">
+        <div class="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/80 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent"></div>
+    </div>
+
+    <div class="w-full px-6 md:px-24 relative z-10 pt-16">
+        <div class="max-w-2xl">
+            <div class="flex items-center gap-3 mb-6">
+                <span id="hero-type" class="bg-indigo-600 text-white text-[10px] font-black px-2 py-1 rounded tracking-wider uppercase">Učitavanje</span>
+                <span id="hero-rating" class="text-indigo-400 text-sm font-bold">★ -.--</span>
+            </div>
+
+            <h1 id="hero-title" class="text-5xl md:text-8xl font-black mb-6 tracking-tighter uppercase leading-[0.95] md:leading-[0.85] drop-shadow-lg">
+                <span class="text-indigo-500 animate-pulse">Učitavanje...</span>
+            </h1>
+
+            <p id="hero-desc" class="text-gray-300 text-base md:text-lg mb-10 max-w-lg leading-relaxed line-clamp-4 drop-shadow-md">
+                Povezujemo se sa bazom. Najpopularniji anime serijali će se prikazati uskoro.
+            </p>
+
+            <button id="hero-details-btn" class="hover:shadow-indigo-500/50 shadow-lg shadow-indigo-500/30 bg-white text-black font-black py-4 px-10 rounded-full hover:bg-indigo-500 hover:text-white transition-all transform hover:scale-105 uppercase tracking-widest text-sm">
+                Detalji Serijala
+            </button>
+        </div>
+    </div>
+</section>
+
+<section class="px-6 md:px-24 py-20 relative z-10 bg-[#050505]">
+    <div class="flex justify-between items-end mb-8">
+        <h2 class="text-3xl font-black border-l-4 border-indigo-500 pl-4 uppercase tracking-tighter">Aktuelna <span class="text-indigo-500">Sezona</span></h2>
+        <a href="{{ url_for('season') }}" class="text-xs font-bold text-gray-500 hover:text-indigo-400 uppercase tracking-widest transition">Prikaži sve &rarr;</a>
+    </div>
+    
+    <div id="trending-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        </div>
+</section>
+{% endblock %}

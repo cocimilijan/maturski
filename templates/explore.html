@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="pt-28 px-6 md:px-24 min-h-screen">
+    <h2 class="text-3xl md:text-4xl font-black mb-10 border-l-4 border-indigo-500 pl-4 uppercase tracking-tighter">
+        {{ title }}
+    </h2>
+
+    <div id="explore-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-10">
+        <p class="text-indigo-400 col-span-full text-lg animate-pulse">Pretražujem bazu...</p>
+    </div>
+
+    <div id="pagination" class="flex justify-center gap-4 hidden pb-10">
+        <button id="btn-prev" class="bg-gray-900 border border-white/10 hover:bg-indigo-600 text-white font-bold py-2 px-6 rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed uppercase text-xs tracking-wider">
+            &larr; Prethodna
+        </button>
+        <span id="page-info" class="text-gray-400 font-bold py-2 px-4">Stranica 1</span>
+        <button id="btn-next" class="bg-gray-900 border border-white/10 hover:bg-indigo-600 text-white font-bold py-2 px-6 rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed uppercase text-xs tracking-wider">
+            Sledeća &rarr;
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const grid = document.getElementById('explore-grid');
+        const pagination = document.getElementById('pagination');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const pageInfo = document.getElementById('page-info');
+        
+        // Uzimamo bazni API link iz Flask-a
+        const baseApiUrl = "{{ base_api_url | safe }}"; 
+        let currentPage = 1;
+
+        async function loadData(page) {
+            grid.innerHTML = '<p class="text-indigo-400 col-span-full animate-pulse">Učitavanje podataka...</p>';
+            pagination.classList.add('hidden');
+
+            try {
+                // Ako API link već ima '?', dodajemo '&page=', ako nema dodajemo '?page='
+                const separator = baseApiUrl.includes('?') ? '&' : '?';
+                const response = await fetch(`${baseApiUrl}${separator}page=${page}`);
+                const data = await response.json();
+                const animeList = data.data;
+
+                if (!animeList || animeList.length === 0) {
+                    grid.innerHTML = '<p class="text-gray-500 col-span-full text-lg">Nema pronađenih rezultata.</p>';
+                    return;
+                }
+
+                grid.innerHTML = '';
+                animeList.forEach(anime => {
+                    const title = anime.title_english || anime.title;
+                    const imageUrl = anime.images.webp.image_url;
+                    const score = anime.score || 'N/A';
+
+                    grid.innerHTML += `
+                        <a href="/anime/${anime.mal_id}" class="group relative rounded-xl overflow-hidden shadow-lg bg-gray-900 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-indigo-500/20 block border border-white/5">
+                            <img src="${imageUrl}" alt="${title}" class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90"></div>
+                            <div class="absolute bottom-0 w-full p-4">
+                                <div class="text-indigo-400 text-xs font-bold mb-1">★ ${score}</div>
+                                <h3 class="text-white font-bold text-sm line-clamp-2">${title}</h3>
+                            </div>
+                        </a>
+                    `;
+                });
+
+                // Podešavanje dugmića za paginaciju
+                const paginationData = data.pagination;
+                if(paginationData && paginationData.last_visible_page > 1) {
+                    pagination.classList.remove('hidden');
+                    pageInfo.innerText = `Stranica ${page} od ${paginationData.last_visible_page}`;
+                    
+                    btnPrev.disabled = !paginationData.has_next_page && page === 1 || page === 1;
+                    btnNext.disabled = !paginationData.has_next_page;
+                }
+
+            } catch (error) {
+                grid.innerHTML = '<p class="text-red-500 col-span-full font-bold">Greška na serveru.</p>';
+            }
+        }
+
+        btnPrev.onclick = () => { if(currentPage > 1) loadData(--currentPage); window.scrollTo(0,0); };
+        btnNext.onclick = () => { loadData(++currentPage); window.scrollTo(0,0); };
+
+        loadData(currentPage);
+    });
+</script>
+{% endblock %}

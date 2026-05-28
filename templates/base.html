@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anivo - Ultimativna Anime Baza</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-[#050505] text-white flex flex-col min-h-screen font-sans overflow-x-hidden">
+    
+    <nav class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/5 transition-all duration-300" id="main-nav">
+        <div class="w-full px-6 md:px-10 h-16 flex items-center justify-between">
+            <a href="{{ url_for('index') }}" class="text-2xl font-black tracking-tighter text-indigo-500 cursor-pointer hover:text-indigo-400 transition z-50">
+                ANIVO
+            </a>
+
+            <div class="hidden md:flex gap-6 text-xs font-bold uppercase tracking-widest text-gray-400 absolute left-1/2 transform -translate-x-1/2">
+                <a href="{{ url_for('index') }}" class="hover:text-white transition">Početna</a>
+                <a href="{{ url_for('season') }}" class="hover:text-white transition">Sezona</a>
+                <a href="{{ url_for('top_anime') }}" class="hover:text-white transition">Top Liste</a>
+            </div>
+
+            <div class="hidden md:flex items-center gap-6">
+                <form action="{{ url_for('search') }}" method="GET" class="relative w-64">
+                    <input type="text" name="q" placeholder="Pretraži anime..." required class="w-full bg-white/5 border border-white/10 rounded-full py-1.5 px-4 text-sm text-white focus:outline-none focus:border-indigo-500 transition placeholder-gray-500">
+                    <button type="submit" class="absolute right-3 top-2 text-gray-400 hover:text-indigo-400 transition-colors duration-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
+                </form>
+
+                <div class="flex items-center gap-3 border-l border-white/10 pl-6">
+                    {% if session.get('user') %}
+                        <a href="{{ url_for('logout') }}" class="text-xs font-bold text-red-400 hover:text-red-300 transition uppercase tracking-wider">Odjava</a>
+                        <a href="{{ url_for('profile') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold py-2 px-4 rounded-full transition shadow-lg shadow-indigo-500/20 uppercase tracking-widest">Moj Profil</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="text-xs font-bold hover:text-indigo-400 transition uppercase tracking-wider">Prijava</a>
+                        <a href="{{ url_for('register') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold py-2 px-4 rounded-full transition shadow-lg shadow-indigo-500/20 uppercase tracking-widest">Registracija</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none z-50 p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <div id="mobile-menu" class="fixed inset-0 bg-[#050505] z-40 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden pt-20 px-6 flex flex-col">
+        <form action="{{ url_for('search') }}" method="GET" class="relative w-full mb-8">
+            <input type="text" name="q" placeholder="Pretraži anime serijale..." required class="w-full bg-white/10 border border-white/20 rounded-xl py-4 px-5 text-base text-white focus:outline-none focus:border-indigo-500 transition placeholder-gray-400">
+            <button type="submit" class="absolute right-4 top-4 text-gray-400 hover:text-indigo-400 transition-colors duration-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </button>
+        </form>
+
+        <div class="flex flex-col gap-6 text-xl font-black uppercase tracking-tighter border-b border-white/10 pb-8 mb-8">
+            <a href="{{ url_for('index') }}" class="text-white hover:text-indigo-500 transition">Početna</a>
+            <a href="{{ url_for('season') }}" class="text-white hover:text-indigo-500 transition">Trenutna Sezona</a>
+            <a href="{{ url_for('top_anime') }}" class="text-white hover:text-indigo-500 transition">Top Liste</a>
+        </div>
+
+        <div class="flex flex-col gap-4">
+            {% if session.get('user') %}
+                <a href="{{ url_for('profile') }}" class="w-full text-center bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg uppercase tracking-widest text-sm">Moj Profil</a>
+                <a href="{{ url_for('logout') }}" class="w-full text-center border border-red-500/50 text-red-400 font-bold py-4 rounded-xl uppercase tracking-widest text-sm">Odjava</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="w-full text-center border border-white/20 text-white font-bold py-4 rounded-xl uppercase tracking-widest text-sm">Prijava</a>
+                <a href="{{ url_for('register') }}" class="w-full text-center bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg uppercase tracking-widest text-sm">Registracija</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sistem za zatvaranje poruka -->
+    <div class="fixed top-24 left-1/2 transform -translate-x-1/2 z-[100] w-full max-w-lg px-4" id="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-3 p-4 rounded-xl shadow-2xl text-sm font-bold flex items-center justify-between backdrop-blur-md
+                        {% if category == 'success' %} bg-green-900/95 text-green-300 border border-green-500/50 
+                        {% else %} bg-red-900/95 text-red-300 border border-red-500/50 {% endif %}">
+                        <span class="flex-1 text-center md:text-left">{{ message }}</span>
+                        <button onclick="this.parentElement.remove()" class="ml-4 font-black text-white hover:text-gray-300 transition text-xl leading-none">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-black/50 border-t border-white/5 py-8 mt-10">
+        <div class="text-center text-gray-500 text-[10px] font-bold tracking-widest uppercase">
+            <p>Anivo &copy; 2026. Sva prava zadržana.</p>
+        </div>
+    </footer>
+
+    <button id="scrollToTopBtn" class="fixed bottom-6 right-6 bg-indigo-600 text-white p-3 rounded-full shadow-lg opacity-0 transform translate-y-10 transition-all duration-300 z-40 focus:outline-none">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"></path></svg>
+    </button>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
