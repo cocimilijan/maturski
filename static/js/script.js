@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Funkcije za API na početnoj strani
 async function fetchTrendingAnime() {
     try {
-        const response = await fetch('https://api.jikan.moe/v4/top/anime?filter=airing&limit=7');
+        const response = await fetch('https://api.jikan.moe/v4/seasons/now?limit=7&order_by=members&sort=desc');
         const data = await response.json();
         const animeList = data.data;
 
